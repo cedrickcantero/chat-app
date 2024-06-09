@@ -4,17 +4,23 @@ import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
+import dotenv from 'dotenv';
+
+// Load environment variables from .env file
+dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3001",
-    methods: ["GET", "POST"]
+    origin: process.env.NODE_ENV === 'production' ? 'https://chat-client-iota-beige.vercel.app' : 'http://localhost:3001',
+    methods: ['GET', 'POST']
   }
 });
 
-app.use(cors());
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' ? 'https://chat-client-iota-beige.vercel.app' : 'http://localhost:3001'
+}));
 
 const PORT = process.env.PORT || 3002;
 
