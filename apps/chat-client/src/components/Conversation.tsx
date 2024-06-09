@@ -22,6 +22,9 @@ const Conversation: React.FC = () => {
   const [userList, setUserList] = useState<string[]>([]);
   const [showEmojis, setShowEmojis] = useState(false);
 
+  console.log("socket",socket)
+  console.log("process.env.REACT_APP_API_URL",process.env.REACT_APP_API_URL)
+
   useEffect(() => {
     socket.emit('join', nickname);
 
