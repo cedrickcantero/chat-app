@@ -1,5 +1,8 @@
+// apps/chat-client/src/pages/Home.tsx
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import styles from './Home.module.scss';
 
 const Home: React.FC = () => {
   const [nickname, setNickname] = useState('');
@@ -13,18 +16,21 @@ const Home: React.FC = () => {
   };
 
   return (
-    <div>
-      <h1>Enter your nickname</h1>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          value={nickname}
-          onChange={(e) => setNickname(e.target.value)}
-          placeholder="Nickname"
-          required
-        />
-        <button type="submit">Join Chat</button>
-      </form>
+    <div className={styles.container}>
+      <div className={styles.formWrapper}>
+        <h1 className={styles.title}>Enter your nickname</h1>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            value={nickname}
+            onChange={(e) => setNickname(e.target.value)}
+            placeholder="Nickname"
+            className={styles.inputField}
+            required
+          />
+          <button type="submit" className={styles.joinButton}>Join Chat</button>
+        </form>
+      </div>
     </div>
   );
 };

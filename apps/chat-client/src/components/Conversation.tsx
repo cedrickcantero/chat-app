@@ -6,7 +6,7 @@ import { io } from 'socket.io-client';
 import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
 import styles from './Conversation.module.scss';
 
-const socket = io('http://localhost:3002');
+const socket = io(process.env.REACT_APP_API_URL!);
 
 interface Message {
   sender: string;
