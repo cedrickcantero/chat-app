@@ -1,6 +1,4 @@
-// apps/chat-client/src/components/Conversation.tsx
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
@@ -21,9 +19,7 @@ const Conversation: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [userList, setUserList] = useState<string[]>([]);
   const [showEmojis, setShowEmojis] = useState(false);
-
-  console.log("socket",socket)
-  console.log("process.env.REACT_APP_API_URL",process.env.REACT_APP_API_URL)
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     socket.emit('join', nickname);
@@ -40,6 +36,12 @@ const Conversation: React.FC = () => {
       socket.disconnect();
     };
   }, [nickname]);
+
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
 
   const handleSendMessage = (event: React.FormEvent) => {
     event.preventDefault();
@@ -62,6 +64,7 @@ const Conversation: React.FC = () => {
               <strong>{msg.sender}</strong>: {msg.message} <span className={styles.time}>({msg.time})</span>
             </div>
           ))}
+          <div ref={messagesEndRef} />
         </div>
         <form onSubmit={handleSendMessage} className={styles.formContainer}>
           <input
