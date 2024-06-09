@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
 import styles from './Conversation.module.scss';
@@ -14,14 +14,20 @@ interface Message {
 
 const Conversation: React.FC = () => {
   const location = useLocation();
-  const { nickname } = location.state as { nickname: string };
+  const navigate = useNavigate();
+  const { nickname } = location.state as { nickname: string } || {};
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [userList, setUserList] = useState<string[]>([]);
   const [showEmojis, setShowEmojis] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    if (!nickname) {
+      navigate('/');
+      return;
+    }
+
     socket.emit('join', nickname);
 
     socket.on('message', (message: Message) => {
@@ -35,12 +41,10 @@ const Conversation: React.FC = () => {
     return () => {
       socket.disconnect();
     };
-  }, [nickname]);
+  }, [nickname, navigate]);
 
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   const handleSendMessage = (event: React.FormEvent) => {
@@ -52,7 +56,7 @@ const Conversation: React.FC = () => {
   };
 
   const addEmoji = (emojiObject: EmojiClickData, event: MouseEvent) => {
-    setMessage(message + emojiObject.emoji);
+    setMessage((prevMessage) => prevMessage + emojiObject.emoji);
   };
 
   return (
@@ -64,7 +68,7 @@ const Conversation: React.FC = () => {
               <strong>{msg.sender}</strong>: {msg.message} <span className={styles.time}>({msg.time})</span>
             </div>
           ))}
-          <div ref={messagesEndRef} />
+          <div ref={messagesEndRef}></div>
         </div>
         <form onSubmit={handleSendMessage} className={styles.formContainer}>
           <input

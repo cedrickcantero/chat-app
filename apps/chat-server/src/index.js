@@ -3,8 +3,9 @@ const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const moment = require('moment-timezone')
+const moment = require('moment-timezone');
 
+// Load environment variables from .env file
 dotenv.config();
 
 const app = express();
@@ -32,6 +33,12 @@ const PORT = process.env.PORT || 3002;
 
 const users = new Map();
 
+app.get('/check-nickname', (req, res) => {
+  const { nickname } = req.query;
+  const nicknameExists = Array.from(users.values()).includes(nickname);
+  res.json({ exists: nicknameExists });
+});
+
 io.on('connection', (socket) => {
   console.log('a user connected');
 
@@ -50,7 +57,7 @@ io.on('connection', (socket) => {
     io.emit('message', {
       sender,
       message,
-      time: new Date().toLocaleTimeString()
+      time: moment().tz('Asia/Manila').format('hh:mm A') // Philippine time
     });
   });
 
@@ -61,7 +68,7 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('message', {
       sender: 'Server',
       message: `${nickname} has left the chat`,
-      time: new Date().toLocaleTimeString()
+      time: moment().tz('Asia/Manila').format('hh:mm A') // Philippine time
     });
     console.log('user disconnected');
   });
